@@ -1,0 +1,12 @@
+pos.db
+pos.db-shm
+pos.db-wal
+pos.exe
+pos-debug.db
+pos-debug.db-shm
+pos-debug.db-wal
+pos-test.db
+pos-test.db-shm
+pos-test.db-wal
+events/*
+!events/.gitkeep

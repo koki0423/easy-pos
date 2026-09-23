@@ -1,0 +1,61 @@
+store:
+  name: テストショップ
+  currency: JPY
+
+products:
+  - id: item_a
+    name: テスト商品A
+    unit_price: 100
+    initial_stock: 20
+  - id: item_b
+    name: テスト商品B
+    unit_price: 200
+    initial_stock: 15
+  - id: item_c
+    name: テスト商品C
+    unit_price: 300
+    initial_stock: 12
+  - id: item_d
+    name: テスト商品D
+    unit_price: 400
+    initial_stock: 10
+  - id: item_e
+    name: テスト商品E
+    unit_price: 500
+    initial_stock: 8
+  - id: item_f
+    name: テスト商品F
+    unit_price: 600
+    initial_stock: 6
+
+set_discounts:
+  - id: starter-set
+    name: スターターセット
+    items:
+      - product_id: item_a
+        quantity: 1
+      - product_id: item_b
+        quantity: 1
+    set_price: 250
+
+  - id: standard-set
+    name: スタンダードセット
+    items:
+      - product_id: item_c
+        quantity: 1
+      - product_id: item_d
+        quantity: 1
+    set_price: 600
+
+  - id: bulk-set
+    name: まとめ買いセット
+    items:
+      - product_id: item_a
+        quantity: 2
+      - product_id: item_e
+        quantity: 1
+      - product_id: item_f
+        quantity: 1
+    set_price: 1200
+audit:
+  output_directory: ""

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POSレジ</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header id="pos-header" class="app-header" hidden>
+        <div>
+          <p class="app-label">POSレジ</p>
+          <h1 id="store-name">読み込み中…</h1>
+        </div>
+        <div class="header-actions">
+          <a class="csv-download" href="/api/sales/export.csv">売上CSVを出力</a>
+          <a class="settings-button" href="/settings.html">設定</a>
+        </div>
+      </header>
+
+      <div id="pos-layout" class="pos-layout" hidden>
+        <section class="products-panel" aria-labelledby="products-title">
+          <div class="section-heading">
+            <h2 id="products-title">商品</h2>
+            <p>商品を追加してください。</p>
+          </div>
+          <div id="product-list" class="product-list" aria-live="polite"></div>
+        </section>
+
+        <aside class="cart-panel" aria-labelledby="cart-title">
+          <div class="cart-heading">
+            <h2 id="cart-title">会計</h2>
+            <button id="clear-cart" class="text-button" type="button">注文を取消</button>
+          </div>
+          <div id="correction-banner" class="correction-banner" hidden></div>
+          <div id="cart-list" class="cart-list">
+            <p class="empty-cart">商品を追加してください</p>
+          </div>
+          <div class="totals" aria-live="polite">
+            <div><span>小計</span><strong id="subtotal">¥0</strong></div>
+            <div class="discount"><span>セット割引</span><strong id="discount">−¥0</strong></div>
+            <div id="applied-sets" class="applied-sets"></div>
+            <div class="grand-total"><span>お支払い合計</span><strong id="total">¥0</strong></div>
+          </div>
+          <button id="checkout" class="checkout-button" type="button" disabled>会計を確定</button>
+          <p id="notice" class="notice" role="status" aria-live="polite"></p>
+        </aside>
+
+        <section class="sales-panel" aria-labelledby="sales-title">
+          <div class="sales-heading">
+            <h2 id="sales-title">直近の売上</h2>
+            <button id="refresh-sales" class="text-button" type="button">更新</button>
+          </div>
+          <div id="sales-list" class="sales-list" aria-live="polite">
+            <p class="empty-sales">売上はまだありません</p>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <dialog id="event-selection-dialog" class="event-selection-dialog" aria-labelledby="event-selection-title">
+      <div>
+        <p class="app-label">POSを開始</p>
+        <h2 id="event-selection-title">使用する会計DBを選択</h2>
+        <p class="event-selection-description">イベントごとに売上・在庫・商品設定を分けて管理できます。</p>
+
+        <section class="event-selection-section" aria-labelledby="create-event-title">
+          <h3 id="create-event-title">新規作成</h3>
+          <p>新しいイベント用のDBと空の商品設定を作成し、続けて設定画面で最初の商品を登録します。</p>
+          <form id="event-create-form" class="event-create-form">
+            <label for="event-create-id">イベント名（DB名）
+              <input id="event-create-id" type="text" maxlength="64" pattern="[A-Za-z0-9_-]+" placeholder="例: event-2026-autumn" required autocomplete="off" />
+            </label>
+            <button type="submit" class="primary-button">新規DBを作成して開始</button>
+          </form>
+        </section>
+
+        <section class="event-selection-section" aria-labelledby="open-event-title">
+          <h3 id="open-event-title">既存のDBを読み込み</h3>
+          <p>再開するイベントを選択してください。</p>
+          <div id="event-list" class="event-list" aria-live="polite"></div>
+        </section>
+        <p id="event-selection-error" class="event-selection-error" role="alert"></p>
+      </div>
+    </dialog>
+
+    <dialog id="adjustment-dialog" class="adjustment-dialog" aria-labelledby="adjustment-title">
+      <form id="adjustment-form">
+        <h2 id="adjustment-title">会計の取消・訂正</h2>
+        <p id="adjustment-sale-summary" class="adjustment-summary"></p>
+        <fieldset>
+          <legend>処理を選択</legend>
+          <label><input type="radio" name="adjustment-type" value="void" checked /> 取消（支払い・受け渡し前）</label>
+          <label><input type="radio" name="adjustment-type" value="refund" /> 返品・返金（支払い・受け渡し後）</label>
+          <label><input type="radio" name="adjustment-type" value="correction" /> 訂正して再会計</label>
+        </fieldset>
+        <label class="adjustment-field" for="adjustment-reason">理由
+          <select id="adjustment-reason">
+            <option value="商品選択の誤り">商品選択の誤り</option>
+            <option value="数量入力の誤り">数量入力の誤り</option>
+            <option value="重複会計">重複会計</option>
+            <option value="その他">その他</option>
+          </select>
+        </label>
+        <label id="adjustment-other-field" class="adjustment-field" for="adjustment-other" hidden>理由の詳細
+          <input id="adjustment-other" type="text" maxlength="200" />
+        </label>
+        <p id="adjustment-cart-warning" class="adjustment-warning" hidden>現在の未確定カートは、訂正する会計の内容で置き換わります。</p>
+        <p id="adjustment-error" class="adjustment-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="adjustment-cancel" type="button">戻る</button>
+          <button id="adjustment-submit" type="submit">処理を確定</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>
