@@ -41,6 +41,12 @@ const eventCreateID = document.querySelector("#event-create-id");
 const eventList = document.querySelector("#event-list");
 const eventSelectionError = document.querySelector("#event-selection-error");
 
+const adjustmentReasons = {
+  void: ["誤操作", "商品選択の誤り", "数量入力の誤り", "重複会計", "その他"],
+  refund: ["商品選択の誤り", "数量入力の誤り", "重複会計", "その他"],
+  correction: ["商品選択の誤り", "数量入力の誤り", "重複会計", "その他"],
+};
+
 const yen = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 });
 const amount = (value) => yen.format(value);
 
@@ -374,7 +380,20 @@ function selectedAdjustmentType() {
   return adjustmentForm.querySelector('input[name="adjustment-type"]:checked').value;
 }
 
+function updateAdjustmentReasons() {
+  const selectedReason = adjustmentReason.value;
+  const reasons = adjustmentReasons[selectedAdjustmentType()];
+  adjustmentReason.replaceChildren(...reasons.map((reason) => {
+    const option = document.createElement("option");
+    option.value = reason;
+    option.textContent = reason;
+    return option;
+  }));
+  adjustmentReason.value = reasons.includes(selectedReason) ? selectedReason : reasons[0];
+}
+
 function updateAdjustmentForm() {
+  updateAdjustmentReasons();
   const correction = selectedAdjustmentType() === "correction";
   adjustmentOtherField.hidden = adjustmentReason.value !== "その他";
   adjustmentCartWarning.hidden = !correction || state.quantities.size === 0;
